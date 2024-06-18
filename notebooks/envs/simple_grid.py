@@ -1,29 +1,40 @@
+# 这是一个 Unix 风格的 shebang 行，指定使用系统默认的 Python 解释器
 #!/usr/bin/env python
 
 # simple_grid.py
 # based on frozen_lake.py
 # adapted by Frans Oliehoek.
 # 
-import sys
-from contextlib import closing
+import sys # 提供对一些与 Python 解释器和环境相关的函数和变量的访问。
+from contextlib import closing # 提供 closing 上下文管理器,用于确保资源在使用后得到适当关闭。
 
 import numpy as np
-from io import StringIO
+from io import StringIO # 提供了一个在内存中模拟文件对象的类,可用于文本输入/输出。
 #from six import StringIO, b
-import gym
-from gym import utils
-from gym import Env, spaces
-from gym.utils import seeding
+import gym # OpenAI Gym 是一个用于开发和比较强化学习算法的工具包,提供了各种环境。
+from gym import utils # 包含一些 Gym 环境相关的工具函数（子模块）。
+from gym import Env, spaces # 定义了一个自定义的 Gym 环境
+from gym.utils import seeding # gym.utils子模块中的函数。用于设置随机数生成器的种子(seed)。
 
 
 def categorical_sample(prob_n, np_random):
     """
+    本质：使用了 NumPy 库提供的数组操作和随机数生成功能
+    
+    1、函数定义
+    prob_n: 一个包含类别概率的 NumPy 数组。每一行代表一个类别的概率分布。
+    np_random: 一个 NumPy 随机数生成器对象。
+
+    2、功能：
+    这个函数实现了从一个多类别分布中进行采样的操作。
+    给定一组类别概率,函数会根据这些概率随机选择一个类别并返回它的索引。
+    
     Sample from categorical distribution
     Each row specifies class probabilities
     """
-    prob_n = np.asarray(prob_n)
-    csprob_n = np.cumsum(prob_n)
-    return (csprob_n > np_random.rand()).argmax()
+    prob_n = np.asarray(prob_n) # 将输入的概率分布转换为 NumPy 数组格式。
+    csprob_n = np.cumsum(prob_n) # 计算概率分布的累积和。这样做是为了后面的概率抽样。
+    return (csprob_n > np_random.rand()).argmax() # csprob_n > np_random.rand() 返回一个布尔数组,指示哪些类别的累积概率大于随机数。argmax() 函数返回布尔数组中第一个 True 值的索引,即所抽取的类别索引。
 
 
 class DiscreteEnv(Env):
